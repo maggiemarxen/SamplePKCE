@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>Some title</title>
+    </head>
+    <body>
+        <div id="foo"></div>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://statics.teams.microsoft.com/sdk/v1.5.2/js/MicrosoftTeams.min.js" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://alcdn.msauth.net/lib/1.1.3/js/msal.js"></script>
+        <script>
+            $(document).ready(() => {
+                microsoftTeams.initialize();
+
+                microsoftTeams.getContext((ctx) => {
+                    try {
+                        // setup MSAL
+                        var myMSALObj = new Msal.UserAgentApplication({
+                            auth: {
+                                clientId: "83217275-2bec-4a51-8d83-20b10ec13dc8",
+                                redirectUri: "https://richdizz.ngrok.io/auth.html"
+                            },
+                            cache: {
+                                cacheLocation: "localStorage",
+                                storeAuthStateInCookie: true,
+                            },
+                        });
+
+                        // handle response from token flow
+                        myMSALObj.handleRedirectCallback((error, response) => {
+                            if (error)
+                                microsoftTeams.authentication.notifyFailure(error);
+                            else
+                                microsoftTeams.authentication.notifySuccess(response.accessToken);
+                        });
+
+                        // Config
+                        const tokenRequestObj = {
+                            scopes: ["user.read"],
+                            loginHint: ctx.loginHint
+                        };
+
+                        // perform the token request
+                        
+                            myMSALObj.acquireTokenRedirect(tokenRequestObj);
+                    }
+                    catch (error) {
+                        alert(error);
+                        console.log(error);
+                        microsoftTeams.authentication.notifyFailure(error);
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

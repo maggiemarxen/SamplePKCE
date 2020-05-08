@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>Some title</title>
+    </head>
+    <body>
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://statics.teams.microsoft.com/sdk/v1.5.2/js/MicrosoftTeams.min.js" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://alcdn.msauth.net/lib/1.1.3/js/msal.js"></script>
+        <button id="signin" style="display: none;">Sign-in</button>
+        <div id="info"></div>
+        <script>
+            $(document).ready(() => {
+                microsoftTeams.initialize();
+
+                microsoftTeams.getContext((ctx) => {
+                    // setup MSAL
+                    const myMSALObj = new Msal.UserAgentApplication({
+                        auth: {
+                            clientId: "83217275-2bec-4a51-8d83-20b10ec13dc8",
+                            redirectUri: "https://richdizz.ngrok.io/auth.html",
+                        },
+                        cache: {
+                            cacheLocation: "localStorage",
+                            storeAuthStateInCookie: true,
+                        },
+                    });
+
+                    // Config for acquiring token silently
+                    const tokenRequestObj = {
+                        scopes: ["user.read"],
+                        loginHint: ctx.loginHint // important for silent flow
+                    };
+
+                    // try to sign-in silently
+                    (async function main() {
+                        if (myMSALObj.getAccount()) {
+                            try {
+                                // Try to acquire token silently. This will fail if there isn't an existing session with AAD
+                                console.info("acquiring token silently...");
+                                const authTokenResult = await myMSALObj.acquireTokenSilent(tokenRequestObj);
+                                console.info("successfully acquired token silently");
+                                console.info(authTokenResult);
+
+                                // display access token
+                                $("#info").text(authTokenResult.accessToken);
+                                $("#signin").show();
+                            } catch (error) {
+                                // silent failed...output error to console
+                                if (error.errorCode == "login_required") {
+                                    console.error("Failed to get token silently because the user is not logged in. Try establishing a session with AAD by logging into another service with this user.");
+                                } else if (error.errorCode == "interaction_required") {
+                                    console.error("Failed to get token silently because the sign-in flow requires interaction.");
+                                } else if (error.errorCode == "consent_required") {
+                                    console.error("Failed to get token silently because the app does not have consent. Either have the admin pre-grant consent for the tenant, or click the button below to complete a one-time consent process.");
+                                } else {
+                                    console.error("Something went wrong. See error below");
+                                    console.error(error);
+                                }
+
+                                // signin failed...show login button
+                                $("#signin").show();
+                            }
+                        }
+                        else
+                            $("#signin").show();
+                    })().catch(err => console.error(err));
+
+                    $("#signin").click(() => {
+                        microsoftTeams.authentication.authenticate({
+                            url: window.location.origin + "/auth.html",
+                            width: 600,
+                            height: 535,
+                            successCallback: function (result) {
+                                $("#info").text(result);
+                            },
+                            failureCallback: function (reason) {
+                                $("#info").text(result);
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

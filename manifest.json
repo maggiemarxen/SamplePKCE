@@ -1,0 +1,43 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.6/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.6",
+    "version": "1.0.0",
+    "showLoadingIndicator": false,
+    "id": "74b59459-ecb3-46d0-a5e1-89a4e31b2b23",
+    "packageName": "microsoft.teams.devapp",
+    "developer": {
+        "name": "Maggie Marxen",
+        "websiteUrl": "https://www.microsoft.com",
+        "privacyUrl": "https://www.microsoft.com",
+        "termsOfUseUrl": "https://www.microsoft.com"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "IdentitySamplePKCE",
+        "full": ""
+    },
+    "description": {
+        "short": "IdentitySamplePKCE",
+        "full": "IdentitySamplePKCE"
+    },
+    "accentColor": "#FFFFFF",
+    "staticTabs": [
+        {
+            "entityId": "authtest",
+            "name": "AuthTest",
+            "contentUrl": "https://127.0.0.1:8080",
+            "websiteUrl": "https://127.0.0.1:8080",
+            "scopes": [
+                "personal"
+            ]
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": []
+}
